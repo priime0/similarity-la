@@ -3,8 +3,11 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const path = require("path");
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const server = require('http').createServer(app);
+const socketOptions = {
+    "path": "/socket.io",
+}
+const io = require('socket.io')(server.listen(port));
 
 app.use(express.static('public'));
 
@@ -20,10 +23,7 @@ app.get('/script.js', (_, res) => {
     res.sendFile(path.join(__dirname, '../frontend/script.js'));
 });
 
-io.on('connect', (socket) => {
+io.on('connection', (socket) => {
     console.log("User connected");
 });
 
-app.listen(port, () => {
-    console.log(`Listening at http://localhost:${port}`);
-});

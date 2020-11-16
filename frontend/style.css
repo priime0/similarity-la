@@ -52,6 +52,12 @@ body {
     animation-direction: alternate;
 }
 
+h1 {
+    color: #ffffff;
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+}
+
 input {
     text-align: center;
 }

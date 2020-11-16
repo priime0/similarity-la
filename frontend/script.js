@@ -31,4 +31,4 @@ const app = new Vue({
     },
 })
 
-console.log("Test");
+const socket = io();
