@@ -6,8 +6,14 @@
     height: 100vh;
 }
 
+#nameinput {
+    width: 94%;
+    margin: 5px;
+}
+
 #roomcodeinput {
     width: 94%;
+    margin: 5px;
 }
 
 #roombuttons {
@@ -53,6 +59,12 @@ body {
 }
 
 h1 {
+    color: #ffffff;
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+}
+
+p {
     color: #ffffff;
     font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
