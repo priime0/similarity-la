@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.node_modules/
+
+# Yarn
+yarn.lock
+
+# Editors
+.idea/
+*.iml
+.vscode/
+
+# Metadata
+.DS_Store
+Thumbs.db
+
+# Builds
+dist/
+build/
+
+# Files
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.swp
+*.config
+*.actual
+~*.docx
