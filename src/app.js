@@ -9,7 +9,10 @@ const socketOptions = {
 }
 const io = require('socket.io')(server.listen(port));
 
-const { generateRoomCode } = require("./helpers");
+const { 
+    generateRoomCode,
+    roomExists
+} = require("./helpers");
 
 // Hacked database 'cause I'm lazy.
 const rooms = {};
@@ -48,9 +51,17 @@ io.on('connection', socket => {
 
     socket.on('join-room', info => {
         const { username, roomCode } = info;
-        console.log(`${username} joining ${roomCode}`);
+        console.log(`${username} request to join ${roomCode}`);
+
+        if (!roomExists(rooms, roomCode)) {
+            socket.emit("invalid-code", roomCode);
+            return;
+        }
+
+        console.log(`${username} joined ${roomCode}`);
+
         socket.join(roomCode);
-        room[roomCode].users.push({
+        rooms[roomCode].users.push({
             name: username,
             choices: [],
         });

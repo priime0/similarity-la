@@ -16,6 +16,7 @@
             <div v-if="!inRoom">
                 <h1>Similarity!</h1>
                 <lobby></lobby>
+                <p>{{ error }}</p>
             </div>
             <div v-if="inRoom"></div>
         </div>

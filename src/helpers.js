@@ -10,6 +10,11 @@ function generateRoomCode () {
     return code;
 }
 
+function roomExists (rooms, roomCode) {
+    return rooms.hasOwnProperty(roomCode);
+}
+
 module.exports = {
     generateRoomCode,
+    roomExists,
 }

@@ -24,6 +24,7 @@ Vue.component("lobby", {
             }
             this.invalidName = false;
             console.log(`join room ${this.roomCode}`);
+            requestJoinRoom(this.username, this.roomCode);
         },
         createRoom: function () {
             if (this.username.length <= 5) {
@@ -55,6 +56,7 @@ const app = new Vue({
         username: "",
         inRoom: false,
         roomCode: "",
+        error: "",
     },
 })
 
@@ -66,12 +68,17 @@ socket.on("code", roomCode => {
     app.inRoom = true;
 });
 
+socket.on("invalid-code", roomCode => {
+    console.log(`Invalid room code: ${roomCode}`);
+    app.error = "Invalid room code!";
+});
+
 function requestNewRoom (username) {
     socket.emit("new-room", username);
     app.username = username;
 }
 
-function joinRoom (username) {
+function requestJoinRoom (username, roomCode) {
     const info = {
         username,
         roomCode,
