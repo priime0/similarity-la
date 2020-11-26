@@ -42,16 +42,16 @@ Vue.component("lobby", {
 
 Vue.component("admin-panel", {
     props: ["roomCode"],
-    template: `<button v-on:click="adminStartGame"></button>`,
+    template: `<button v-on:click="adminStartGame">start game</button>`,
     methods: {
         adminStartGame: function () {
-            startGame(roomCode);
+            startGame(this.roomCode);
         }
     }
 });
 
 Vue.component("room", {
-    props: ["room", "game-started", "username"],
+    props: ["room", "gamestarted", "username"],
     data: function () {
         return {
             options: [],
@@ -63,13 +63,13 @@ Vue.component("room", {
         <ul>
             <li v-for="user in this.room.users">{{ user.name }}</li>
         </ul>
-        <div v-if="isRoomAdmin()">
+        <div v-if="this.username === this.room.admin && !this.gamestarted">
             <admin-panel :roomCode="this.room.code"></admin-panel>
         </div>
     </div>`,
     methods: {
-        isRoomAdmin: function () {
-            return this.username === this.room.admin;
+        showAdminPanel: function () {
+            return (this.username === this.room.admin) && !this.gamestarted;
         }
     },
 })
@@ -93,7 +93,6 @@ socket.on("info", room => {
     app.roomCode = code;
     app.room = room;
     app.inRoom = true;
-    app.gameStarted = true;
 });
 
 socket.on("join-error", error => {
@@ -101,11 +100,17 @@ socket.on("join-error", error => {
     app.error = error;
 });
 
-socket.on("playerjoin", username => {
+socket.on("player-join", username => {
     app.room.users.push({
         name: username,
         choices: []
     });
+});
+
+socket.on("game-start", () => {
+    app.gameStarted = true;
+    app.room.gameStarted = true;
+    console.log("Game started");
 });
 
 function requestNewRoom (username) {

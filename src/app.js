@@ -83,11 +83,12 @@ io.on('connection', socket => {
             choices: [],
         });
         socket.emit("info", room);
-        socket.broadcast.to(roomCode).emit("playerjoin", username);
+        socket.broadcast.to(roomCode).emit("player-join", username);
         console.log(JSON.stringify(rooms, null, 2));
     });
 
     socket.on('start-game', roomCode => {
         rooms[roomCode].gameStarted = true;
+        io.to(roomCode).emit('game-start');
     });
 });
