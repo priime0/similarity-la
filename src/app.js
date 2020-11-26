@@ -62,11 +62,17 @@ io.on('connection', socket => {
         }
         const room = rooms[roomCode];
 
+        if (room.gameStarted) {
+            socket.emit("join-error", "Game already in play!");
+            return;
+        }
+
         for (let ind = 0; ind < room.users.length; ind++) {
             const user = room.users[ind];
             if (user.name === username) {
                 socket.emit("join-error", "Username already in use!");
             }
+            return;
         }
 
         console.log(`${username} joined ${roomCode}`);
@@ -79,5 +85,9 @@ io.on('connection', socket => {
         socket.emit("info", room);
         socket.broadcast.to(roomCode).emit("playerjoin", username);
         console.log(JSON.stringify(rooms, null, 2));
+    });
+
+    socket.on('start-game', roomCode => {
+        rooms[roomCode].gameStarted = true;
     });
 });
