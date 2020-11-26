@@ -38,22 +38,37 @@ Vue.component("lobby", {
     }
 });
 
+Vue.component("admin-panel", {
+    props: ["roomCode"],
+    template: `<button v-on:click="adminStartGame"></button>`,
+    methods: {
+        adminStartGame: function () {
+            startGame(roomCode);
+        }
+    }
+});
+
 Vue.component("room", {
-    props: ["room", "gameStarted"],
+    props: ["room", "game-started", "username"],
     data: function () {
         return {
-            options,
+            options: [],
         }
     },
     template:
     `<div id="newroom">
-        <h2>{{ room.code }}</h2>
+        <h2>{{ this.room.code }}</h2>
         <ul>
-            <li v-for="user in room.users">{{ user.name }}</li>
+            <li v-for="user in this.room.users">{{ user.name }}</li>
         </ul>
+        <div v-if="isRoomAdmin()">
+            <admin-panel :roomCode="this.room.code"></admin-panel>
+        </div>
     </div>`,
     methods: {
-
+        isRoomAdmin: function () {
+            return this.username === this.room.admin;
+        }
     },
 })
 
@@ -103,4 +118,8 @@ function requestJoinRoom (username, roomCode) {
     }
     socket.emit("join-room", info);
     app.username = username;
+}
+
+function startGame (roomCode) {
+    socket.emit("start-game", roomCode);
 }

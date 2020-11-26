@@ -77,7 +77,7 @@ io.on('connection', socket => {
             choices: [],
         });
         socket.emit("info", room);
-        io.to(roomCode).emit("playerjoin", username);
+        socket.broadcast.to(roomCode).emit("playerjoin", username);
         console.log(JSON.stringify(rooms, null, 2));
     });
 });
