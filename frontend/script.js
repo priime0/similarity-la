@@ -7,7 +7,7 @@ Vue.component("lobby", {
         }
     },
     template: 
-    `<div id="join-room">
+    `<div id="joinroom">
     <input id="nameinput" maxlength="12" v-model="username" placeholder="Name" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
     <input id="roomcodeinput" maxlength="6" v-model="roomCode" placeholder="Room Code" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
     <div id="roombuttons">
@@ -39,12 +39,19 @@ Vue.component("lobby", {
 });
 
 Vue.component("room", {
+    props: ["room", "gameStarted"],
     data: function () {
         return {
-            choices: []
+            options,
         }
     },
-    template: ``,
+    template:
+    `<div id="newroom">
+        <h2>{{ room.code }}</h2>
+        <ul>
+            <li v-for="user in room.users">{{ user.name }}</li>
+        </ul>
+    </div>`,
     methods: {
 
     },
@@ -55,22 +62,33 @@ const app = new Vue({
     data: {
         username: "",
         inRoom: false,
+        gameStarted: false,
         roomCode: "",
         error: "",
+        room: {},
     },
 })
 
 const socket = io();
 
-socket.on("code", roomCode => {
-    console.log(`Room Code: ${roomCode}`);
-    app.roomCode = roomCode;
+socket.on("info", room => {
+    const { code, users } = room;
+    app.roomCode = code;
+    app.room = room;
     app.inRoom = true;
+    app.gameStarted = true;
 });
 
-socket.on("invalid-code", roomCode => {
-    console.log(`Invalid room code: ${roomCode}`);
-    app.error = "Invalid room code!";
+socket.on("join-error", error => {
+    console.log(`Error joining: ${error}`);
+    app.error = error;
+});
+
+socket.on("playerjoin", username => {
+    app.room.users.push({
+        name: username,
+        choices: []
+    });
 });
 
 function requestNewRoom (username) {

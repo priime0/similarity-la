@@ -58,7 +58,7 @@ body {
     animation-direction: alternate;
 }
 
-h1 {
+h1, h2, h3 {
     color: #ffffff;
     font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;

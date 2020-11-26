@@ -38,6 +38,9 @@ io.on('connection', socket => {
         const roomCode = generateRoomCode();
         socket.join(roomCode);
         const room = {
+            code: roomCode,
+            admin: username,
+            gameStarted: false,
             users: [{
                 name: username,
                 choices: [],
@@ -45,7 +48,7 @@ io.on('connection', socket => {
         };
         rooms[roomCode] = room;
         console.log(`Created room with code ${roomCode}`);
-        io.to(roomCode).emit("code", roomCode);
+        socket.emit("info", room);
         console.log(JSON.stringify(rooms, null, 2));
     });
 
@@ -54,8 +57,16 @@ io.on('connection', socket => {
         console.log(`${username} request to join ${roomCode}`);
 
         if (!roomExists(rooms, roomCode)) {
-            socket.emit("invalid-code", roomCode);
+            socket.emit("join-error", "Invalid room code!");
             return;
+        }
+        const room = rooms[roomCode];
+
+        for (let ind = 0; ind < room.users.length; ind++) {
+            const user = room.users[ind];
+            if (user.name === username) {
+                socket.emit("join-error", "Username already in use!");
+            }
         }
 
         console.log(`${username} joined ${roomCode}`);
@@ -65,7 +76,8 @@ io.on('connection', socket => {
             name: username,
             choices: [],
         });
-        io.to(roomCode).emit("code", roomCode);
+        socket.emit("info", room);
+        io.to(roomCode).emit("playerjoin", username);
         console.log(JSON.stringify(rooms, null, 2));
     });
 });
