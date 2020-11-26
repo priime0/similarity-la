@@ -18,7 +18,8 @@ Vue.component("lobby", {
     </div>`,
     methods: {
         joinRoom: function () {
-            if (this.username.length <= 5) {
+            const MIN_LENGTH = 3;
+            if (this.username.length < MIN_LENGTH) {
                 this.invalidName = true;
                 return;
             }
@@ -27,7 +28,8 @@ Vue.component("lobby", {
             requestJoinRoom(this.username, this.roomCode);
         },
         createRoom: function () {
-            if (this.username.length <= 5) {
+            const MIN_LENGTH = 3;
+            if (this.username.length <= MIN_LENGTH) {
                 this.invalidName = true;
                 return;
             }
