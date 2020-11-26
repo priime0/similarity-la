@@ -71,8 +71,8 @@ io.on('connection', socket => {
             const user = room.users[ind];
             if (user.name === username) {
                 socket.emit("join-error", "Username already in use!");
+                return;
             }
-            return;
         }
 
         console.log(`${username} joined ${roomCode}`);
