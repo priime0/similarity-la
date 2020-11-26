@@ -64,6 +64,10 @@ h1, h2, h3, p, li {
     text-align: center;
 }
 
+li {
+    list-style-type: none;
+}
+
 input {
     text-align: center;
 }
