@@ -14,7 +14,22 @@ function roomExists (rooms, roomCode) {
     return rooms.hasOwnProperty(roomCode);
 }
 
+function createRoom (roomCode, admin) {
+    const room = {
+        code: roomCode,
+        admin,
+        gameStarted: false,
+        users: [{
+            name: admin,
+            choices: [],
+        }]
+    };
+
+    return room;
+}
+
 module.exports = {
     generateRoomCode,
     roomExists,
+    createRoom,
 }

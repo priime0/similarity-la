@@ -11,7 +11,8 @@ const io = require('socket.io')(server.listen(port));
 
 const { 
     generateRoomCode,
-    roomExists
+    roomExists,
+    createRoom
 } = require("./helpers");
 
 // Hacked database 'cause I'm lazy.
@@ -36,18 +37,10 @@ io.on('connection', socket => {
         console.log(username);
         console.log("Creating room");
         const roomCode = generateRoomCode();
-        socket.join(roomCode);
-        const room = {
-            code: roomCode,
-            admin: username,
-            gameStarted: false,
-            users: [{
-                name: username,
-                choices: [],
-            }]
-        };
+        const room = createRoom(roomCode, username);
         rooms[roomCode] = room;
         console.log(`Created room with code ${roomCode}`);
+        socket.join(roomCode);
         socket.emit("info", room);
         console.log(JSON.stringify(rooms, null, 2));
     });
