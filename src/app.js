@@ -12,7 +12,8 @@ const io = require('socket.io')(server.listen(port));
 const { 
     generateRoomCode,
     roomExists,
-    createRoom
+    createRoom,
+    generateShowList,
 } = require("./helpers");
 
 // Hacked database 'cause I'm lazy.
@@ -83,5 +84,11 @@ io.on('connection', socket => {
     socket.on('start-game', roomCode => {
         rooms[roomCode].gameStarted = true;
         io.to(roomCode).emit('game-start');
+
+        const showsList = generateShowList();
+        rooms[roomCode].showsList = showsList;
+        io.in(roomCode).emit("show-list", showsList);
+
+        io.in(roomCode).emit("make-choice");
     });
 });
