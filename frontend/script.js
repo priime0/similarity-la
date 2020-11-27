@@ -51,7 +51,7 @@ Vue.component("admin-panel", {
 });
 
 Vue.component("room", {
-    props: ["room", "gamestarted", "username", "show", "madechoice"],
+    props: ["room", "gamestarted", "username", "song", "madechoice"],
     data: function () {
         return {
             choicesMade: 0,
@@ -67,7 +67,7 @@ Vue.component("room", {
             <admin-panel :roomCode="this.room.code"></admin-panel>
         </div>
         <div v-if="this.gamestarted">
-            <h3>{{ this.show }}</h3>
+            <h3>{{ this.song }}</h3>
             <div>
                 <button @click="choose(1)">1</button>
                 <button @click="choose(2)">2</button>
@@ -97,7 +97,7 @@ const app = new Vue({
         error: "",
         inRoom: false,
         gameStarted: false,
-        show: "",
+        song: "",
         madechoice: false,
         room: {},
     },
@@ -135,13 +135,13 @@ socket.on("game-start", () => {
     console.log("Game started");
 });
 
-socket.on("show-list", showsList => {
-    app.room.showsList = showsList;
+socket.on("song-list", songsList => {
+    app.room.songsList = songsList;
 });
 
 socket.on("make-choice", () => {
     app.madechoice = false;
-    app.show = app.room.showsList.shift();
+    app.song = app.room.songsList.shift();
 });
 
 function requestNewRoom (username) {

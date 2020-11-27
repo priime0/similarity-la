@@ -23,7 +23,7 @@ function createRoom (roomCode, admin) {
             name: admin,
             choices: [],
         }],
-        showsList: [],
+        songsList: [],
         current: 0,
         totalChoices: 0,
     };
@@ -31,18 +31,19 @@ function createRoom (roomCode, admin) {
     return room;
 }
 
+// Algorithm from following SO thread:
 // https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
-function generateShowList () {
+function generateSongList () {
     const MAX_SHOWS = 10;
-    const showList = require("./list");
-    for (let i = showList.length - 1; i > 0; i--) {
+    const songList = require("./list");
+    for (let i = songList.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i+1));
-        const x = showList[i];
-        showList[i] = showList[j];
-        showList[j] = x;
+        const x = songList[i];
+        songList[i] = songList[j];
+        songList[j] = x;
     }
     
-    return showList.slice(0, MAX_SHOWS);
+    return songList.slice(0, MAX_SHOWS);
 }
 
 function pprint (json) {
@@ -53,6 +54,6 @@ module.exports = {
     generateRoomCode,
     roomExists,
     createRoom,
-    generateShowList,
+    generateSongList,
     pprint,
 }

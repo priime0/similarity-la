@@ -13,7 +13,7 @@ const {
     generateRoomCode,
     roomExists,
     createRoom,
-    generateShowList,
+    generateSongList,
     pprint,
 } = require("./helpers");
 
@@ -86,10 +86,10 @@ io.on('connection', socket => {
         rooms[roomCode].gameStarted = true;
         io.to(roomCode).emit('game-start');
 
-        const showsList = generateShowList();
-        rooms[roomCode].showsList = showsList;
+        const songsList = generateSongList();
+        rooms[roomCode].songsList = songsList;
         pprint(rooms);
-        io.in(roomCode).emit("show-list", showsList);
+        io.in(roomCode).emit("song-list", songsList);
 
         io.in(roomCode).emit("make-choice");
     });
@@ -108,7 +108,7 @@ io.on('connection', socket => {
 
         if (room.totalChoices === room.users.length) {
             room.totalChoices = 0;
-            if (room.current < room.showsList.length) {
+            if (room.current < room.songsList.length) {
                 room.current++;
                 io.in(roomCode).emit("make-choice");
             }
