@@ -56,7 +56,7 @@ Vue.component("similarity-panel", {
     `<div id="similarities">
         <h3>Your Most Similar Interests!</h3>
         <ul>
-            <li v-for="item in this.similarities" :key="item.name">{{ item.name }} {{ item.distance }}</li>
+            <li v-for="item in this.similarities" :key="item.name">{{ item.name }} {{ item.distance.toFixed(2) }}</li>
         </ul>
     </div>`
 });
