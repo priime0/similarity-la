@@ -11,8 +11,8 @@ Vue.component("lobby", {
     <input id="nameinput" maxlength="12" v-model="username" placeholder="Name" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
     <input id="roomcodeinput" maxlength="6" v-model="roomCode" placeholder="Room Code" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
     <div id="roombuttons">
-        <button class="roombutton" v-on:click="joinRoom">Join Room</button>
-        <button class="roombutton" v-on:click="createRoom">Create Room</button>
+        <button class="roombutton" @click="joinRoom">Join Room</button>
+        <button class="roombutton" @click="createRoom">Create Room</button>
     </div>
     <p v-if="invalidName">Make your name longer :(</p>
     </div>`,
@@ -42,7 +42,7 @@ Vue.component("lobby", {
 
 Vue.component("admin-panel", {
     props: ["roomCode"],
-    template: `<button v-on:click="adminStartGame">start game</button>`,
+    template: `<button @click="adminStartGame">start game</button>`,
     methods: {
         adminStartGame: function () {
             startGame(this.roomCode);
@@ -51,10 +51,10 @@ Vue.component("admin-panel", {
 });
 
 Vue.component("room", {
-    props: ["room", "gamestarted", "username", "show"],
+    props: ["room", "gamestarted", "username", "show", "madechoice"],
     data: function () {
         return {
-            options: [],
+            choicesMade: 0,
         }
     },
     template:
@@ -69,16 +69,21 @@ Vue.component("room", {
         <div v-if="this.gamestarted">
             <h3>{{ this.show }}</h3>
             <div>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
+                <button @click="choose(1)">1</button>
+                <button @click="choose(2)">2</button>
+                <button @click="choose(3)">3</button>
+                <button @click="choose(4)">4</button>
+                <button @click="choose(5)">5</button>
             </div>
         </div>
     </div>`,
     methods: {
-
+        choose: function (num) {
+            if (!this.madechoice) {
+                console.log(`Made choice ${num}`);
+                this.$emit("choice", true);
+            }
+        }
     },
 })
 
@@ -91,7 +96,13 @@ const app = new Vue({
         inRoom: false,
         gameStarted: false,
         show: "",
+        madechoice: false,
         room: {},
+    },
+    methods: {
+        mchoice: function (choice) {
+            this.madechoice = choice;
+        }
     },
 })
 
@@ -127,6 +138,7 @@ socket.on("show-list", showsList => {
 });
 
 socket.on("make-choice", () => {
+    app.madechoice = false;
     app.show = app.room.showsList.shift();
 });
 
