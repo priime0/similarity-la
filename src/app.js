@@ -108,12 +108,14 @@ io.on('connection', socket => {
 
         if (room.totalChoices === room.users.length) {
             room.totalChoices = 0;
-            if (room.current < room.songsList.length) {
+            if (room.current < room.songsList.length - 1) {
                 room.current++;
                 io.in(roomCode).emit("make-choice");
             }
             else {
-                // End Game, Calculate Stuff
+                console.log(`Game ended at room ${roomCode}`);
+                room.gameEnded = true;
+                io.in(roomCode).emit("game-end", room);
             }
         }
     });

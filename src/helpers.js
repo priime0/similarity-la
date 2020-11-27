@@ -19,6 +19,7 @@ function createRoom (roomCode, admin) {
         code: roomCode,
         admin,
         gameStarted: false,
+        gameEnded: false,
         users: [{
             name: admin,
             choices: [],

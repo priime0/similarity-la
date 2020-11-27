@@ -50,8 +50,19 @@ Vue.component("admin-panel", {
     }
 });
 
+Vue.component("similarity-panel", {
+    props: ["similarities"],
+    template: 
+    `<div id="similarities">
+        <h3>Your Most Similar Interests!</h3>
+        <ul>
+            <li v-for="item in this.similarities" :key="item.name">{{ item.name }} {{ item.distance }}</li>
+        </ul>
+    </div>`
+});
+
 Vue.component("room", {
-    props: ["room", "gamestarted", "username", "song", "madechoice"],
+    props: ["room", "gamestarted", "gameended", "username", "song", "madechoice", "similarities"],
     data: function () {
         return {
             choicesMade: 0,
@@ -61,12 +72,12 @@ Vue.component("room", {
     `<div id="newroom">
         <h2>{{ this.room.code }}</h2>
         <ul>
-            <li v-for="user in this.room.users">{{ user.name }}</li>
+            <li v-for="user in this.room.users" :key="user.name">{{ user.name }}</li>
         </ul>
         <div v-if="this.username === this.room.admin && !this.gamestarted">
             <admin-panel :roomCode="this.room.code"></admin-panel>
         </div>
-        <div v-if="this.gamestarted">
+        <div v-if="this.gamestarted && !this.gameended">
             <h3>{{ this.song }}</h3>
             <div>
                 <button @click="choose(1)">1</button>
@@ -76,6 +87,10 @@ Vue.component("room", {
                 <button @click="choose(5)">5</button>
             </div>
             <p v-if="this.madechoice">Made a choice!</p>
+        </div>
+        <div v-if="this.gameended">
+            <p>Game Ended!</p>
+            <similarity-panel :similarities="similarities"></similarity-panel>
         </div>
     </div>`,
     methods: {
@@ -96,10 +111,10 @@ const app = new Vue({
         roomCode: "",
         error: "",
         inRoom: false,
-        gameStarted: false,
         song: "",
         madechoice: false,
         room: {},
+        similarities: [],
     },
     methods: {
         mchoice: function (choice) {
@@ -130,7 +145,6 @@ socket.on("player-join", username => {
 });
 
 socket.on("game-start", () => {
-    app.gameStarted = true;
     app.room.gameStarted = true;
     console.log("Game started");
 });
@@ -142,6 +156,12 @@ socket.on("song-list", songsList => {
 socket.on("make-choice", () => {
     app.madechoice = false;
     app.song = app.room.songsList.shift();
+});
+
+socket.on("game-end", room => {
+    app.room = room;
+    app.room.gameEnded = true;
+    getSimilarities();
 });
 
 function requestNewRoom (username) {
@@ -169,4 +189,59 @@ function sendChoice (username, choice) {
         choice,
     }
     socket.emit("made-choice", info);
+}
+
+function getSimilarities () {
+    console.log("Getting similarities");
+    const users = app.room.users;
+    let playerChoices;
+    for (let ind = 0; ind < users.length; ind++) {
+        const user = users[ind];
+        if (user.name === app.username) {
+            playerChoices = user.choices;
+        }
+    }
+    if (playerChoices === null) {
+        app.error = "User does not exist!"
+        return;
+    }
+
+    console.log("Player choices: ");
+    console.log(playerChoices);
+
+    const similarities = [];
+    for (let ind = 0; ind < users.length; ind++) {
+        const user = users[ind];
+        console.log(`Comparing ${app.username} to ${user.name}`);
+        console.log(user.choices);
+        if (user.name === app.username) {
+            continue;
+        }
+
+        const distance = calculateDistance(playerChoices, user.choices);
+
+        const item = {
+            name: user.name,
+            distance,
+        }
+        console.log(item);
+        similarities.push(item);
+    }
+
+    similarities.sort((a, b) => {
+        return a.distance - b.distance;
+    });
+
+    app.similarities = similarities;
+}
+
+function calculateDistance (vec1, vec2) {
+    let distance = 0;
+    for (let ind = 0; ind < Math.min(vec1.length, vec2.length); ind++) {
+        const diff = vec1[ind] - vec2[ind];
+        distance += Math.pow(diff, 2);
+    }
+    distance = Math.sqrt(distance);
+
+    return distance;
 }
