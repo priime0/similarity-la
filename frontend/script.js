@@ -51,7 +51,7 @@ Vue.component("admin-panel", {
 });
 
 Vue.component("room", {
-    props: ["room", "gamestarted", "username"],
+    props: ["room", "gamestarted", "username", "show"],
     data: function () {
         return {
             options: [],
@@ -66,11 +66,19 @@ Vue.component("room", {
         <div v-if="this.username === this.room.admin && !this.gamestarted">
             <admin-panel :roomCode="this.room.code"></admin-panel>
         </div>
+        <div v-if="this.gamestarted">
+            <h3>{{ this.show }}</h3>
+            <div>
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>5</button>
+            </div>
+        </div>
     </div>`,
     methods: {
-        showAdminPanel: function () {
-            return (this.username === this.room.admin) && !this.gamestarted;
-        }
+
     },
 })
 
@@ -78,10 +86,11 @@ const app = new Vue({
     el: "#app",
     data: {
         username: "",
-        inRoom: false,
-        gameStarted: false,
         roomCode: "",
         error: "",
+        inRoom: false,
+        gameStarted: false,
+        show: "",
         room: {},
     },
 })
@@ -111,6 +120,14 @@ socket.on("game-start", () => {
     app.gameStarted = true;
     app.room.gameStarted = true;
     console.log("Game started");
+});
+
+socket.on("show-list", showsList => {
+    app.room.showsList = showsList;
+});
+
+socket.on("make-choice", () => {
+    app.show = app.room.showsList.shift();
 });
 
 function requestNewRoom (username) {
