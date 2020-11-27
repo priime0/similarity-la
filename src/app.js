@@ -14,6 +14,7 @@ const {
     roomExists,
     createRoom,
     generateShowList,
+    pprint,
 } = require("./helpers");
 
 // Hacked database 'cause I'm lazy.
@@ -43,7 +44,7 @@ io.on('connection', socket => {
         console.log(`Created room with code ${roomCode}`);
         socket.join(roomCode);
         socket.emit("info", room);
-        console.log(JSON.stringify(rooms, null, 2));
+        pprint(rooms);
     });
 
     socket.on('join-room', info => {
@@ -78,7 +79,7 @@ io.on('connection', socket => {
         });
         socket.emit("info", room);
         socket.broadcast.to(roomCode).emit("player-join", username);
-        console.log(JSON.stringify(rooms, null, 2));
+        pprint(rooms);
     });
 
     socket.on('start-game', roomCode => {
@@ -87,6 +88,7 @@ io.on('connection', socket => {
 
         const showsList = generateShowList();
         rooms[roomCode].showsList = showsList;
+        pprint(rooms);
         io.in(roomCode).emit("show-list", showsList);
 
         io.in(roomCode).emit("make-choice");

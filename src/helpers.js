@@ -43,9 +43,14 @@ function generateShowList () {
     return showList.slice(0, MAX_SHOWS);
 }
 
+function pprint (json) {
+    console.log(JSON.stringify(json, null, 2));
+}
+
 module.exports = {
     generateRoomCode,
     roomExists,
     createRoom,
     generateShowList,
+    pprint,
 }
