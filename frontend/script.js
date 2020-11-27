@@ -75,6 +75,7 @@ Vue.component("room", {
                 <button @click="choose(4)">4</button>
                 <button @click="choose(5)">5</button>
             </div>
+            <p v-if="this.madechoice">Made a choice!</p>
         </div>
     </div>`,
     methods: {
@@ -82,6 +83,7 @@ Vue.component("room", {
             if (!this.madechoice) {
                 console.log(`Made choice ${num}`);
                 this.$emit("choice", true);
+                sendChoice(this.username, num);
             }
         }
     },
@@ -158,4 +160,13 @@ function requestJoinRoom (username, roomCode) {
 
 function startGame (roomCode) {
     socket.emit("start-game", roomCode);
+}
+
+function sendChoice (username, choice) {
+    const info = {
+        roomCode: app.roomCode,
+        username,
+        choice,
+    }
+    socket.emit("made-choice", info);
 }

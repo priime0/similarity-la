@@ -93,4 +93,28 @@ io.on('connection', socket => {
 
         io.in(roomCode).emit("make-choice");
     });
+
+    socket.on('made-choice', info => {
+        const { roomCode, username, choice } = info;
+        pprint(info);
+        const room = rooms[roomCode];
+        for (let ind = 0; ind < room.users.length; ind++) {
+            const user = room.users[ind];
+            if (user.name === username) {
+                user.choices.push(choice);
+                room.totalChoices++;
+            }
+        }
+
+        if (room.totalChoices === room.users.length) {
+            room.totalChoices = 0;
+            if (room.current < room.showsList.length) {
+                room.current++;
+                io.in(roomCode).emit("make-choice");
+            }
+            else {
+                // End Game, Calculate Stuff
+            }
+        }
+    });
 });

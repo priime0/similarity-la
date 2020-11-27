@@ -24,6 +24,8 @@ function createRoom (roomCode, admin) {
             choices: [],
         }],
         showsList: [],
+        current: 0,
+        totalChoices: 0,
     };
 
     return room;
