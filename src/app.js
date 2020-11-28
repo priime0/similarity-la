@@ -36,7 +36,10 @@ io.on('connection', socket => {
     socket.on('new-room', username => {
         console.log(username);
         console.log("Creating room");
-        const roomCode = generateRoomCode();
+        let roomCode = generateRoomCode();
+        while (roomExists(rooms, roomCode)) {
+            roomCode = generateRoomCode();
+        }
         const room = createRoom(roomCode, username);
         rooms[roomCode] = room;
         console.log(`Created room with code ${roomCode}`);
