@@ -41,8 +41,6 @@ When the server has the euclidian distances between all players, it begins perfo
 
 ### Prerequisites
 
-- A Unix system (MacOS, Linux, or BSD, 'cause I don't do Windows)
-
 - [Node.js](https://nodejs.org) JavaScript Runtime
 
 - [Yarn](https://yarnpkg.com) Package Manager
