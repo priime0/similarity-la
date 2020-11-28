@@ -4,10 +4,8 @@ const app = express();
 const port = 3000;
 const path = require("path");
 const server = require('http').createServer(app);
-const socketOptions = {
-    "path": "/socket.io",
-}
 const io = require('socket.io')(server.listen(port));
+const math = require("mathjs");
 
 const { 
     generateRoomCode,
@@ -130,7 +128,8 @@ io.on('connection', socket => {
         // TODO: Check edge case where the submitted similarities don't
         // have edges to all players.
         if (Object.keys(room.matrix).length === room.players.length) {
-            createClusters(roomCode);
+            const clusters = getClusters(roomCode);
+            io.in(roomCode).emit("clusters", clusters);
         }
     });
 });
@@ -147,10 +146,28 @@ function endGame (roomCode) {
     room.players = players;
 }
 
-function createClusters (roomCode) {
+function getClusters (roomCode) {
     const room = rooms[roomCode];
+    const players = room.players;
     const adjacencyMatrix = createAdjMatrix(roomCode);
     const diagonalMatrix = createDiagMatrix(adjacencyMatrix);
+
+    const laplacianMatrix = createLapMatrix(adjacencyMatrix, diagonalMatrix);
+
+    getEigenStuff(laplacianMatrix)
+        .then(eigenStuff => {
+            eigenStuff.sort((a, b) => {
+                a.value - b.value;
+            });
+
+            console.log(eigenStuff);
+
+            const clusters = createClusters(players, eigenStuff);
+            return clusters;
+        })
+        .catch(error => {
+            console.log(error);
+        });
 }
 
 function createAdjMatrix (roomCode) {
@@ -202,7 +219,7 @@ function createDiagMatrix (adjacencyMatrix) {
     const diagonalMatrix = [];
     for (let row = 0; row < adjacencyMatrix.length; row++) {
         const matrixRow = [];
-        for (let col = 0; col < adjacencyMatrix[col].length; col++) {
+        for (let col = 0; col < adjacencyMatrix[row].length; col++) {
             if (row === col) {
                 matrixRow.push(entries[row]);
             }
@@ -214,4 +231,54 @@ function createDiagMatrix (adjacencyMatrix) {
     }
 
     return diagonalMatrix;
+}
+
+function createLapMatrix (adjacencyMatrix, diagonalMatrix) {
+    return math.matrix(math.add(adjacencyMatrix, diagonalMatrix));
+}
+
+function getEigenStuff (laplacianMatrix) {
+    return new Promise((resolve, reject) => {
+        const unorderedEigen = math.eigs(laplacianMatrix);
+        console.log(unorderedEigen);
+        const eigenArr = [];
+
+        for (let ind = 0; ind < unorderedEigen.values._data.length; ind++) {
+            const eigenStuff = {
+                value: unorderedEigen.values._data[ind],
+                vector: unorderedEigen.vectors._data[ind],
+            };
+            eigenArr.push(eigenStuff);
+        }
+
+        resolve(eigenArr);
+    });
+}
+
+function createClusters (players, eigenStuff) {
+    const fiedlerVector = eigenStuff[1].vector;
+    console.log("Fiedler Vector");
+    console.log(fiedlerVector);
+    const groupings = [];
+    const group1 = [];
+    const group2 = [];
+    for (let ind = 0; ind < fiedlerVector.length; ind++) {
+        const entry = fiedlerVector[ind];
+        const player = players[ind];
+        console.log(player);
+        if (entry >= 0) {
+            group1.push(player);
+        }
+        else {
+            group2.push(player);
+        }
+    }
+
+    groupings.push(group1);
+    groupings.push(group2);
+
+    console.log("Clusters:");
+    console.log(groupings);
+
+    return groupings;
 }
