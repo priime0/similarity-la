@@ -116,7 +116,66 @@ io.on('connection', socket => {
                 console.log(`Game ended at room ${roomCode}`);
                 room.gameEnded = true;
                 io.in(roomCode).emit("game-end", room);
+                endGame(roomCode);
             }
         }
     });
+
+    socket.on('similarities', info => {
+        const { name, roomCode, similarities } = info;
+        const room = rooms[roomCode];
+
+        room.matrix[name] = similarities;
+
+        // TODO: Check edge case where the submitted similarities don't
+        // have edges to all players.
+        if (Object.keys(room.matrix).length === room.players.length) {
+            createClusters(roomCode);
+        }
+    });
 });
+
+function endGame (roomCode) {
+    const room = rooms[roomCode];
+    const players = [];
+    for (let ind = 0; ind < room.users.length; ind++) {
+        const player = room.users[ind].name;
+        players.push(player);
+    }
+    players.sort();
+
+    room.players = players;
+}
+
+function createClusters (roomCode) {
+    const room = rooms[roomCode];
+    const adjacencyMatrix = createAdjMatrix (roomCode);
+}
+
+function createAdjMatrix (roomCode) {
+    const room = rooms[roomCode];
+    const players = room.players;
+    const adjacencyMatrix = [];
+    for (let row = 0; row < players.length; row++) {
+        const currRow = room.matrix[players[row]];
+        const matrixRow = [];
+        for (let col = 0; col < players.length; col++) {
+            if (row === col) {
+                matrixRow.push(0);
+            }
+            else {
+                if (currRow.hasOwnProperty(players[col])) {
+                    const edge = currRow[players[col]];
+                    console.log(edge);
+                    matrixRow.push(edge);
+                }
+                else {
+                    matrixRow.push(0);
+                }
+            }
+        }
+        adjacencyMatrix.push(matrixRow);
+    }
+
+    return adjacencyMatrix;
+}

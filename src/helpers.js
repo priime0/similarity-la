@@ -27,6 +27,8 @@ function createRoom (roomCode, admin) {
         songsList: [],
         current: 0,
         totalChoices: 0,
+        players: [],
+        matrix: {},
     };
 
     return room;
