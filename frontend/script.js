@@ -126,8 +126,7 @@ const app = new Vue({
 const socket = io();
 
 socket.on("info", room => {
-    const { code, users } = room;
-    app.roomCode = code;
+    app.roomCode = room.code;
     app.room = room;
     app.inRoom = true;
 });
@@ -161,7 +160,27 @@ socket.on("make-choice", () => {
 socket.on("game-end", room => {
     app.room = room;
     app.room.gameEnded = true;
-    getSimilarities();
+    getSimilarities()
+        .then(similarities => {
+            app.similarities = similarities;
+
+            const simsByName = {};
+            for (let ind = 0; ind < similarities.length; ind++) {
+                const similarity = similarities[ind];
+                simsByName[similarity.name] = similarity.distance;
+            }
+
+            const info = {
+                name: app.username,
+                roomCode: app.roomCode,
+                similarities: simsByName,
+            }
+
+            socket.emit("similarities", info);
+        })
+        .catch(err => {
+            app.error = err;
+        });
 });
 
 function requestNewRoom (username) {
@@ -192,47 +211,41 @@ function sendChoice (username, choice) {
 }
 
 function getSimilarities () {
-    console.log("Getting similarities");
-    const users = app.room.users;
-    let playerChoices;
-    for (let ind = 0; ind < users.length; ind++) {
-        const user = users[ind];
-        if (user.name === app.username) {
-            playerChoices = user.choices;
+    return new Promise((resolve, reject) => {
+        const users = app.room.users;
+        let playerChoices;
+        for (let ind = 0; ind < users.length; ind++) {
+            const user = users[ind];
+            if (user.name === app.username) {
+                playerChoices = user.choices;
+            }
         }
-    }
-    if (playerChoices === null) {
-        app.error = "User does not exist!"
-        return;
-    }
-
-    console.log("Player choices: ");
-    console.log(playerChoices);
-
-    const similarities = [];
-    for (let ind = 0; ind < users.length; ind++) {
-        const user = users[ind];
-        console.log(`Comparing ${app.username} to ${user.name}`);
-        console.log(user.choices);
-        if (user.name === app.username) {
-            continue;
+        if (playerChoices === null) {
+            reject("User does not exist!");
         }
 
-        const distance = calculateDistance(playerChoices, user.choices);
+        const similarities = [];
+        for (let ind = 0; ind < users.length; ind++) {
+            const user = users[ind];
+            if (user.name === app.username) {
+                continue;
+            }
 
-        const item = {
-            name: user.name,
-            distance,
+            const distance = calculateDistance(playerChoices, user.choices);
+
+            const item = {
+                name: user.name,
+                distance,
+            }
+            similarities.push(item);
         }
-        console.log(item);
-        similarities.push(item);
-    }
 
-    similarities.sort((a, b) => {
-        return a.distance - b.distance;
+        similarities.sort((a, b) => {
+            return a.distance - b.distance;
+        });
+
+        resolve(similarities)
     });
-
-    app.similarities = similarities;
 }
 
 function calculateDistance (vec1, vec2) {
