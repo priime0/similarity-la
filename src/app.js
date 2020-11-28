@@ -150,6 +150,7 @@ function endGame (roomCode) {
 function createClusters (roomCode) {
     const room = rooms[roomCode];
     const adjacencyMatrix = createAdjMatrix(roomCode);
+    const diagonalMatrix = createDiagMatrix(adjacencyMatrix);
 }
 
 function createAdjMatrix (roomCode) {
@@ -184,4 +185,33 @@ function createAdjMatrix (roomCode) {
     }
 
     return adjacencyMatrix;
+}
+
+function createDiagMatrix (adjacencyMatrix) {
+    const entries = [];
+    for (let row = 0; row < adjacencyMatrix.length; row++) {
+        let count = 0;
+        for (let col = 0; col < adjacencyMatrix[row].length; col++) {
+            if (adjacencyMatrix[row][col] != 0) {
+                count++;
+            }
+        }
+        entries.push(count);
+    }
+
+    const diagonalMatrix = [];
+    for (let row = 0; row < adjacencyMatrix.length; row++) {
+        const matrixRow = [];
+        for (let col = 0; col < adjacencyMatrix[col].length; col++) {
+            if (row === col) {
+                matrixRow.push(entries[row]);
+            }
+            else {
+                matrixRow.push(0);
+            }
+        }
+        diagonalMatrix.push(matrixRow);
+    }
+
+    return diagonalMatrix;
 }
