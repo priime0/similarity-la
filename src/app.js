@@ -119,7 +119,7 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('similarities', info => {
+    socket.on('similarities', async info => {
         const { name, roomCode, similarities } = info;
         const room = rooms[roomCode];
 
@@ -128,7 +128,7 @@ io.on('connection', socket => {
         // TODO: Check edge case where the submitted similarities don't
         // have edges to all players.
         if (Object.keys(room.matrix).length === room.players.length) {
-            const clusters = getClusters(roomCode);
+            let clusters = await getClusters(roomCode);
             io.in(roomCode).emit("clusters", clusters);
         }
     });
@@ -146,7 +146,7 @@ function endGame (roomCode) {
     room.players = players;
 }
 
-function getClusters (roomCode) {
+async function getClusters (roomCode) {
     const room = rooms[roomCode];
     const players = room.players;
     const adjacencyMatrix = createAdjMatrix(roomCode);
@@ -154,7 +154,7 @@ function getClusters (roomCode) {
 
     const laplacianMatrix = createLapMatrix(adjacencyMatrix, diagonalMatrix);
 
-    getEigenStuff(laplacianMatrix)
+    return getEigenStuff(laplacianMatrix)
         .then(eigenStuff => {
             eigenStuff.sort((a, b) => {
                 a.value - b.value;
@@ -256,7 +256,7 @@ function getEigenStuff (laplacianMatrix) {
 }
 
 function createClusters (players, eigenStuff) {
-    const fiedlerVector = eigenStuff[1].vector;
+    const fiedlerVector = eigenStuff[0].vector;
     console.log("Fiedler Vector");
     console.log(fiedlerVector);
     const groupings = [];
@@ -276,9 +276,6 @@ function createClusters (players, eigenStuff) {
 
     groupings.push(group1);
     groupings.push(group2);
-
-    console.log("Clusters:");
-    console.log(groupings);
 
     return groupings;
 }
