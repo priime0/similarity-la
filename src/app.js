@@ -130,6 +130,7 @@ io.on('connection', socket => {
         if (Object.keys(room.matrix).length === room.players.length) {
             let clusters = await getClusters(roomCode);
             io.in(roomCode).emit("clusters", clusters);
+            deleteRoom(roomCode);
         }
     });
 });
@@ -278,4 +279,8 @@ function createClusters (players, eigenStuff) {
     groupings.push(group2);
 
     return groupings;
+}
+
+function deleteRoom (roomCode) {
+    delete room[roomCode];
 }
