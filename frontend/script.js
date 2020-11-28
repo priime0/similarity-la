@@ -55,14 +55,38 @@ Vue.component("similarity-panel", {
     template: 
     `<div id="similarities">
         <h3>Your Most Similar Interests!</h3>
+        <p>The lower your score, the more your interests align.</p>
         <ul>
             <li v-for="item in this.similarities" :key="item.name">{{ item.name }} {{ item.distance.toFixed(2) }}</li>
         </ul>
     </div>`
 });
 
+Vue.component("clusters-panel", {
+    props: ["username", "clusters"],
+    template:
+    `<div>
+        <h3>Clusters!</h3>
+        <p>The algorithm best paired you with the following people:</p>
+        <ul>
+            <li v-for="player in this.getCluster()">{{ player }}</li>
+        </ul>
+    </div>`,
+    methods: {
+        getCluster: function () {
+            for (let ind = 0; ind < this.clusters.length; ind++) {
+                const cluster = this.clusters[ind];
+                if (cluster.includes(this.username)) {
+                    return cluster.filter(name => name != this.username);
+                }
+            }
+            return [];
+        }
+    }
+});
+
 Vue.component("room", {
-    props: ["room", "gamestarted", "gameended", "username", "song", "madechoice", "similarities"],
+    props: ["room", "gamestarted", "gameended", "username", "song", "madechoice", "similarities", "hasclusters", "clusters"],
     data: function () {
         return {
             choicesMade: 0,
@@ -92,6 +116,11 @@ Vue.component("room", {
             <p>Game Ended!</p>
             <similarity-panel :similarities="similarities"></similarity-panel>
         </div>
+        <clusters-panel v-if="this.gameended && this.hasclusters"
+        :username="username"
+        :clusters="clusters"
+        >
+        </clusters-panel>
     </div>`,
     methods: {
         choose: function (num) {
@@ -115,6 +144,8 @@ const app = new Vue({
         madechoice: false,
         room: {},
         similarities: [],
+        hasclusters: false,
+        clusters: [],
     },
     methods: {
         mchoice: function (choice) {
@@ -129,6 +160,7 @@ socket.on("info", room => {
     app.roomCode = room.code;
     app.room = room;
     app.inRoom = true;
+    app.error = "";
 });
 
 socket.on("join-error", error => {
@@ -181,6 +213,13 @@ socket.on("game-end", room => {
         .catch(err => {
             app.error = err;
         });
+});
+
+socket.on("clusters", clusters => {
+    console.log("clusters");
+    console.log(clusters);
+    app.clusters = clusters;
+    app.hasclusters = true;
 });
 
 function requestNewRoom (username) {
