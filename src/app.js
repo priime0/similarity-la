@@ -149,13 +149,14 @@ function endGame (roomCode) {
 
 function createClusters (roomCode) {
     const room = rooms[roomCode];
-    const adjacencyMatrix = createAdjMatrix (roomCode);
+    const adjacencyMatrix = createAdjMatrix(roomCode);
 }
 
 function createAdjMatrix (roomCode) {
     const room = rooms[roomCode];
     const players = room.players;
     const adjacencyMatrix = [];
+    const EDGE_THRESHOLD = 10;
     for (let row = 0; row < players.length; row++) {
         const currRow = room.matrix[players[row]];
         const matrixRow = [];
@@ -165,9 +166,14 @@ function createAdjMatrix (roomCode) {
             }
             else {
                 if (currRow.hasOwnProperty(players[col])) {
-                    const edge = currRow[players[col]];
-                    console.log(edge);
-                    matrixRow.push(edge);
+                    const inversedEdge = currRow[players[col]];
+                    if (inversedEdge < EDGE_THRESHOLD) {
+                        const edge = EDGE_THRESHOLD - inversedEdge;
+                        matrixRow.push(edge);
+                    }
+                    else {
+                        matrixRow.push(0);
+                    }
                 }
                 else {
                     matrixRow.push(0);
