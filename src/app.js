@@ -260,7 +260,7 @@ function getEigenStuff (laplacianMatrix) {
 }
 
 function createClusters (players, eigenStuff) {
-    const fiedlerVector = eigenStuff[1].vector;
+    const fiedlerVector = (eigenStuff[1] != undefined) ? eigenStuff[1].vector : [1];
     console.log("Fiedler Vector");
     console.log(fiedlerVector);
     const groupings = [];
