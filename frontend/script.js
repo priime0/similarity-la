@@ -85,8 +85,26 @@ Vue.component("clusters-panel", {
     }
 });
 
+Vue.component("song-panel", {
+    props: ["room", "songlist"],
+    template: 
+    `<div>
+        <h3>Song List</h3>
+        <table>
+            <tr v-for="song in this.songlist"><td>{{ song }}</td></tr>
+        </table>
+        <h3>Player Choices</h3>
+        <table>
+            <tr v-for="player in this.room.users">
+                <td>{{ player.name }}</td>
+                <td v-for="choice in player.choices">{{ choice }}</td>
+            </tr>
+        </table>
+    </div>`
+});
+
 Vue.component("room", {
-    props: ["room", "gamestarted", "gameended", "username", "song", "madechoice", "similarities", "hasclusters", "clusters"],
+    props: ["room", "gamestarted", "gameended", "username", "song", "madechoice", "similarities", "hasclusters", "clusters", "songlist"],
     data: function () {
         return {
             choicesMade: 0,
@@ -121,6 +139,11 @@ Vue.component("room", {
         :clusters="clusters"
         >
         </clusters-panel>
+        <song-panel v-if="this.gameended"
+        :room="room"
+        :songlist="songlist"
+        >
+        </song-panel>
     </div>`,
     methods: {
         choose: function (num) {
@@ -146,6 +169,7 @@ const app = new Vue({
         similarities: [],
         hasclusters: false,
         clusters: [],
+        songlist: [],
     },
     methods: {
         mchoice: function (choice) {
@@ -186,7 +210,9 @@ socket.on("song-list", songsList => {
 
 socket.on("make-choice", () => {
     app.madechoice = false;
-    app.song = app.room.songsList.shift();
+    const song = app.room.songsList.shift();
+    app.song = song;
+    app.songlist.push(song);
 });
 
 socket.on("game-end", room => {
