@@ -86,13 +86,20 @@ Vue.component("clusters-panel", {
 });
 
 Vue.component("song-panel", {
-    props: ["room", "songlist"],
+    props: ["songlist"],
     template: 
     `<div>
         <h3>Song List</h3>
         <table>
             <tr v-for="song in this.songlist"><td>{{ song }}</td></tr>
         </table>
+    </div>`
+});
+
+Vue.component("choices-panel", {
+    props: ["room"],
+    template: 
+    `<div>
         <h3>Player Choices</h3>
         <table>
             <tr v-for="player in this.room.users">
@@ -139,11 +146,8 @@ Vue.component("room", {
         :clusters="clusters"
         >
         </clusters-panel>
-        <song-panel v-if="this.gameended"
-        :room="room"
-        :songlist="songlist"
-        >
-        </song-panel>
+        <song-panel :songlist="songlist"></song-panel>
+        <choices-panel v-if="this.gameended" :room="room"></choices-panel>
     </div>`,
     methods: {
         choose: function (num) {
