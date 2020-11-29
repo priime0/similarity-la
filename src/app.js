@@ -238,7 +238,7 @@ function createDiagMatrix (adjacencyMatrix) {
 }
 
 function createLapMatrix (adjacencyMatrix, diagonalMatrix) {
-    return math.matrix(math.add(adjacencyMatrix, diagonalMatrix));
+    return math.matrix(math.subtract(diagonalMatrix, adjacencyMatrix));
 }
 
 function getEigenStuff (laplacianMatrix) {
@@ -260,7 +260,7 @@ function getEigenStuff (laplacianMatrix) {
 }
 
 function createClusters (players, eigenStuff) {
-    const fiedlerVector = eigenStuff[0].vector;
+    const fiedlerVector = eigenStuff[1].vector;
     console.log("Fiedler Vector");
     console.log(fiedlerVector);
     const groupings = [];
