@@ -285,5 +285,5 @@ function createClusters (players, eigenStuff) {
 }
 
 function deleteRoom (roomCode) {
-    delete room[roomCode];
+    delete rooms[roomCode];
 }
