@@ -135,7 +135,8 @@ Vue.component("room", {
                 <button class="choicebutton" @click="choose(4)">4</button>
                 <button class="choicebutton" @click="choose(5)">5</button>
             </div>
-            <p v-if="this.madechoice">Made a choice! Waiting on others!</p>
+            <p v-if="this.madechoice">Made a choice!</p>
+            <p v-if="this.madechoice">Waiting on others...</p>
         </div>
         <div v-if="this.gameended">
             <p>Game Ended!</p>

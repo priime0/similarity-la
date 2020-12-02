@@ -16,12 +16,27 @@
     margin: 5px;
 }
 
+button {
+    border: #cccccc;
+    border-width: 5px;
+    border-radius: 30px;
+    background-color: #f7f7f7;
+    padding: 10px;
+    text-align: center;
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 #roombuttons, button {
     display: flex;
     justify-content: space-around;
 }
 
 .roombutton {
+    width: 100%;
+    margin: 5px;
+}
+
+.choicebutton {
     width: 100%;
     margin: 5px;
 }
@@ -49,8 +64,6 @@
 }
 
 body {
-    
-
     /* Animation */
     -webkit-animation: bgcolor 20s infinite;
     animation: bgcolor 10s infinite;
@@ -62,6 +75,10 @@ h1, h2, h3, p, li, td {
     color: #ffffff;
     font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
+}
+
+h3 {
+    font-size: 90%;
 }
 
 li {
