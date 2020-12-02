@@ -8,8 +8,8 @@ Vue.component("lobby", {
     },
     template: 
     `<div id="joinroom">
-    <input id="nameinput" maxlength="12" v-model="username" placeholder="Name" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
-    <input id="roomcodeinput" maxlength="6" v-model="roomCode" placeholder="Room Code" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);">
+    <input id="nameinput" maxlength="18" v-model="username" placeholder="Name" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.value.trim();this.setSelectionRange(p, p);">
+    <input id="roomcodeinput" maxlength="6" v-model="roomCode" placeholder="Room Code" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.value.trim()this.setSelectionRange(p, p);">
     <div id="roombuttons">
         <button class="roombutton" @click="joinRoom">Join Room</button>
         <button class="roombutton" @click="createRoom">Create Room</button>
@@ -29,7 +29,7 @@ Vue.component("lobby", {
         },
         createRoom: function () {
             const MIN_LENGTH = 3;
-            if (this.username.length <= MIN_LENGTH) {
+            if (this.username.length < MIN_LENGTH) {
                 this.invalidName = true;
                 return;
             }
@@ -129,13 +129,13 @@ Vue.component("room", {
         <div v-if="this.gamestarted && !this.gameended">
             <h3>{{ this.song }}</h3>
             <div>
-                <button @click="choose(1)">1</button>
-                <button @click="choose(2)">2</button>
-                <button @click="choose(3)">3</button>
-                <button @click="choose(4)">4</button>
-                <button @click="choose(5)">5</button>
+                <button class="choicebutton" @click="choose(1)">1</button>
+                <button class="choicebutton" @click="choose(2)">2</button>
+                <button class="choicebutton" @click="choose(3)">3</button>
+                <button class="choicebutton" @click="choose(4)">4</button>
+                <button class="choicebutton" @click="choose(5)">5</button>
             </div>
-            <p v-if="this.madechoice">Made a choice!</p>
+            <p v-if="this.madechoice">Made a choice! Waiting on others!</p>
         </div>
         <div v-if="this.gameended">
             <p>Game Ended!</p>
