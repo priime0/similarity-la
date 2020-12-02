@@ -166,8 +166,15 @@ async function getClusters (roomCode) {
 
             console.log(eigenStuff);
 
-            const clusters = createClusters(players, eigenStuff);
-            return clusters;
+            const MIN_FOR_FOUR_CLUSTERS = 10;
+            if (players.length >= MIN_FOR_FOUR_CLUSTERS) {
+                const clusters = createFourClusters(players, eigenStuff);
+                return clusters;
+            }
+            else {
+                const clusters = createTwoClusters(players, eigenStuff);
+                return clusters;
+            }
         })
         .catch(error => {
             console.log(error);
@@ -259,7 +266,7 @@ function getEigenStuff (laplacianMatrix) {
     });
 }
 
-function createClusters (players, eigenStuff) {
+function createTwoClusters (players, eigenStuff) {
     const fiedlerVector = (eigenStuff[1] != undefined) ? eigenStuff[1].vector : [1];
     console.log("Fiedler Vector");
     console.log(fiedlerVector);
@@ -280,6 +287,44 @@ function createClusters (players, eigenStuff) {
 
     groupings.push(group1);
     groupings.push(group2);
+
+    return groupings;
+}
+
+function createFourClusters (players, eigenStuff) {
+    const fiedlerVec1 = eigenStuff[1].vector;
+    const fiedlerVec2 = eigenStuff[2].vector;
+
+    const groupings = [];
+    const group1 = [];
+    const group2 = [];
+    const group3 = [];
+    const group4 = [];
+
+    for (let ind = 0; ind < fiedlerVec1.length; ind++) {
+        const entry1 = fiedlerVec1[ind];
+        const entry2 = fiedlerVec2[ind];
+
+        const player = players[ind];
+
+        if (entry1 >= 0 && entry2 >= 0) {
+            group1.push(player);
+        }
+        else if (entry1 >= 0 && entry2 <= 0) {
+            group2.push(player);
+        }
+        else if (entry1 <= 0 && entry2 >= 0) {
+            group3.push(player);
+        }
+        else {
+            group4.push(player);
+        }
+    }
+
+    groupings.push(group1);
+    groupings.push(group2);
+    groupings.push(group3);
+    groupings.push(group4);
 
     return groupings;
 }
