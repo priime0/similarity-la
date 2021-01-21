@@ -7,6 +7,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server.listen(port));
 const math = require("mathjs");
 
+let boom = "boom";
+
 const { 
     generateRoomCode,
     roomExists,
